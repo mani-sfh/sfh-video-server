@@ -307,6 +307,7 @@ async function generateExerciseSequence({
         coachingCue: exercise.coaching_cue,
         side: firstSide,
         duration: halfDuration,
+        timeDisplay: timeDisplay,
         tags,
         progressDots
       },
@@ -349,6 +350,7 @@ async function generateExerciseSequence({
         coachingCue: exercise.coaching_cue,
         side: secondSide,
         duration: halfDuration,
+        timeDisplay: timeDisplay,
         tags,
         progressDots
       },
@@ -376,6 +378,7 @@ async function generateExerciseSequence({
         imagePath: mainImageDataUri,
         coachingCue: exercise.coaching_cue,
         duration,
+        timeDisplay: timeDisplay,
         tags,
         progressDots
       },
