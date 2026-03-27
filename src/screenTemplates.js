@@ -197,7 +197,7 @@ export function practiceFrame(exNum, total, name, imageUrl, cue, timeRemaining, 
     : `<span style="font-size:16px;color:rgba(12,17,91,0.3);font-weight:700;">NO IMAGE</span>`;
 
   const cueHTML = cue
-    ? `<p style="font-size:18px;color:${COLORS.crimson};font-weight:700;margin-top:16px;text-align:center;max-width:80%;">"${esc(cue)}"</p>`
+    ? `<p style="font-size:18px;color:${COLORS.crimson};font-weight:700;margin-top:12px;text-align:center;max-width:80%;">"${esc(cue)}"</p>`
     : '';
 
   return baseHTML(
@@ -206,9 +206,10 @@ export function practiceFrame(exNum, total, name, imageUrl, cue, timeRemaining, 
     <div style="flex:1;background:${COLORS.cream};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 40px;position:relative;">
       ${sideBadge}
       <p style="font-family:Petrona,Georgia,serif;font-size:24px;font-weight:700;color:${COLORS.navy};margin-bottom:16px;">${esc(name)}</p>
-      <div style="display:flex;align-items:center;justify-content:center;">
+      <div style="display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
         ${imageHTML}
       </div>
+      <span style="background:${COLORS.teal};color:${COLORS.white};font-size:16px;font-weight:700;padding:8px 20px;border-radius:20px;">${esc(String(totalDuration))}</span>
       ${cueHTML}
       <p style="position:absolute;bottom:12px;font-size:14px;letter-spacing:3px;color:rgba(12,17,91,0.3);font-weight:700;text-transform:uppercase;">SENIOR FITNESS <span style="color:${COLORS.crimson};">HUB</span></p>
     </div>`
