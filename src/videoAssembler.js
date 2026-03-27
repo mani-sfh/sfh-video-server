@@ -9,9 +9,9 @@ const AUDIO_SAMPLE_RATE = 48000;
 const AUDIO_CHANNELS = 'stereo';
 const AUDIO_BITRATE = '128k';
 const FFMPEG_PRESET = 'ultrafast';
-const FFMPEG_CRF = '28';
-const SEGMENT_CONCURRENCY = 3;
-const STATIC_FPS = 24;
+const FFMPEG_CRF = '32';
+const SEGMENT_CONCURRENCY = 4;
+const STATIC_FPS = 15;
 
 async function runBatched(tasks, concurrency) {
   const results = new Array(tasks.length);
