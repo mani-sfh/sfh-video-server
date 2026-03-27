@@ -189,38 +189,34 @@ export function yourTurn(exNum, total, name, timeDisplay, cue, bilateral, side, 
 
 export function practiceFrame(exNum, total, name, imageUrl, cue, timeRemaining, totalDuration, side, tags) {
   const sideBadge = side
-    ? `<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:10;background:${COLORS.crimson};color:${COLORS.white};font-size:16px;font-weight:700;padding:8px 20px;border-radius:20px;box-shadow:0 4px 12px rgba(166,30,81,0.3);">${side.toUpperCase()} SIDE</div>`
-    : '';
-
-  const cueHTML = cue
-    ? `<div style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:10;background:${COLORS.crimson};color:${COLORS.white};font-size:18px;font-weight:700;padding:10px 24px;border-radius:8px;max-width:60%;text-align:center;">"${esc(cue)}"</div>`
+    ? `<span style="position:absolute;top:16px;right:20px;background:${COLORS.crimson};color:${COLORS.white};font-size:16px;font-weight:700;padding:8px 20px;border-radius:20px;">${side.toUpperCase()} SIDE</span>`
     : '';
 
   const imageHTML = imageUrl
-    ? `<img src="${imageUrl}" style="width:100%;height:100%;object-fit:contain;" />`
-    : `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;"><span style="font-size:18px;color:rgba(12,17,91,0.3);font-weight:700;">NO IMAGE</span></div>`;
+    ? `<img src="${imageUrl}" style="max-width:420px;max-height:320px;object-fit:contain;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.1);" />`
+    : `<span style="font-size:16px;color:rgba(12,17,91,0.3);font-weight:700;">NO IMAGE</span>`;
 
-  const nameHTML = `<div style="position:absolute;top:12px;left:16px;z-index:10;">
-    <p style="font-family:Petrona,Georgia,serif;font-size:22px;color:${COLORS.navy};font-weight:700;text-shadow:0 1px 4px rgba(255,255,255,0.8);padding:6px 14px;">${esc(name)}</p>
-  </div>`;
-
-  const tagsOverlay = (tags && Array.isArray(tags) && tags.length > 0)
-    ? `<div style="position:absolute;top:${side ? '56px' : '12px'};right:16px;z-index:10;display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:240px;">
-        ${tags.map(tag => `<span style="background:rgba(15,118,110,0.9);color:${COLORS.white};font-size:14px;font-weight:700;padding:4px 14px;border-radius:14px;">${esc(tag)}</span>`).join('')}
-      </div>`
+  const cueHTML = cue
+    ? `<p style="font-size:18px;color:${COLORS.crimson};font-weight:700;margin-top:12px;text-align:center;max-width:80%;">"${esc(cue)}"</p>`
     : '';
 
   return baseHTML(
     `display:flex;flex-direction:column;`,
     `${progressDotsHTML(exNum, total)}
-    <div style="flex:1;background:${COLORS.cream};position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+    <div style="flex:1;background:${COLORS.cream};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 40px;position:relative;">
       ${sideBadge}
-      ${nameHTML}
-      ${tagsOverlay}
-      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:50px 80px 60px 80px;">
+      <p style="font-family:Petrona,Georgia,serif;font-size:22px;font-weight:700;color:${COLORS.navy};margin-bottom:12px;">${esc(name)}</p>
+      <div style="display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
         ${imageHTML}
       </div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <p style="font-family:Petrona,Georgia,serif;font-size:48px;font-weight:700;color:${COLORS.navy};margin-bottom:8px;">${totalDuration}s</p>
+        <div style="width:300px;height:8px;background:rgba(12,17,91,0.1);border-radius:4px;overflow:hidden;">
+          <div style="width:0%;height:100%;background:${COLORS.crimson};border-radius:4px;"></div>
+        </div>
+      </div>
       ${cueHTML}
+      <p style="position:absolute;bottom:12px;font-size:14px;letter-spacing:3px;color:rgba(12,17,91,0.3);font-weight:700;text-transform:uppercase;">SENIOR FITNESS <span style="color:${COLORS.crimson};">HUB</span></p>
     </div>`
   );
 }
