@@ -134,7 +134,6 @@ async function imageToVideo(imagePath, outputPath, duration, width, height, audi
       .inputOptions(['-loop 1', `-t ${duration}`]);
 
     if (audioPath) {
-      // Use downloaded audio clip — do NOT use -shortest, use -t to control duration
       cmd.input(audioPath);
       cmd.outputOptions([
         '-threads 1',
@@ -148,7 +147,8 @@ async function imageToVideo(imagePath, outputPath, duration, width, height, audi
         `-crf ${FFMPEG_CRF}`,
         '-pix_fmt yuv420p',
         `-r ${STATIC_FPS}`,
-        `-vf scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black`
+        `-vf scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black`,
+        `-af apad=whole_dur=${duration}`
       ]);
     } else {
       // Silent audio
