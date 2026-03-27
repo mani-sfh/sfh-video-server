@@ -189,7 +189,7 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
     dimensions,
     outputPath: path.join(tempDir, 'intro-01-title.png')
   });
-  screens.push({ type: 'image', path: titleCardPath, duration: 8, audioUrl: AUDIO_CLIPS['title-card'] });
+  screens.push({ type: 'image', path: titleCardPath, duration: 10, audioUrl: AUDIO_CLIPS['title-card'] });
 
   const trackerReminderPath = await renderScreenToImage({
     type: 'tracker-reminder',
@@ -197,7 +197,7 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
     dimensions,
     outputPath: path.join(tempDir, 'intro-02-tracker.png')
   });
-  screens.push({ type: 'image', path: trackerReminderPath, duration: 5, audioUrl: AUDIO_CLIPS['tracker-reminder'] });
+  screens.push({ type: 'image', path: trackerReminderPath, duration: 10, audioUrl: AUDIO_CLIPS['tracker-reminder'] });
 
   const equipmentPath = await renderScreenToImage({
     type: 'equipment',
@@ -213,7 +213,7 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
     dimensions,
     outputPath: path.join(tempDir, 'intro-04-start.png')
   });
-  screens.push({ type: 'image', path: letsStartPath, duration: 5, audioUrl: AUDIO_CLIPS['lets-start'] });
+  screens.push({ type: 'image', path: letsStartPath, duration: 10, audioUrl: AUDIO_CLIPS['lets-start'] });
 
   return screens;
 }
@@ -240,7 +240,7 @@ async function generateExerciseSequence({
   const secondSide = firstSide === 'RIGHT' ? 'LEFT' : 'RIGHT';
   const isBilateral = exercise.bilateral === 'yes';
 
-  // Watch and Learn
+  // Watch and Learn (audio: 4s, slide: 6s)
   const watchLearnPath = await renderScreenToImage({
     type: 'watch-learn',
     data: {
@@ -257,12 +257,12 @@ async function generateExerciseSequence({
     dimensions,
     outputPath: path.join(tempDir, `ex${exerciseNumber}-01-watch.png`)
   });
-  segments.push({ type: 'image', path: watchLearnPath, duration: 5, audioUrl: AUDIO_CLIPS['watch-learn'] });
+  segments.push({ type: 'image', path: watchLearnPath, duration: 6, audioUrl: AUDIO_CLIPS['watch-learn'] });
 
   // Exercise Video
   segments.push({ type: 'video', path: assets.videoPath });
 
-  // Your Turn
+  // Your Turn (audio: 3s single / 4s bilateral, slide: 5s single / 6s bilateral)
   const yourTurnAudio = !isBilateral
     ? AUDIO_CLIPS['your-turn']
     : firstSide === 'RIGHT'
@@ -287,7 +287,7 @@ async function generateExerciseSequence({
     dimensions,
     outputPath: path.join(tempDir, `ex${exerciseNumber}-03-yourturn.png`)
   });
-  segments.push({ type: 'image', path: yourTurnPath, duration: 5, audioUrl: yourTurnAudio });
+  segments.push({ type: 'image', path: yourTurnPath, duration: isBilateral ? 6 : 5, audioUrl: yourTurnAudio });
 
   // Practice with countdown
   if (isBilateral) {
@@ -323,7 +323,7 @@ async function generateExerciseSequence({
       resolution
     });
 
-    // Switch sides
+    // Switch sides (audio: 4s, slide: 6s)
     const switchPath = await renderScreenToImage({
       type: 'switch-sides',
       data: {
@@ -336,7 +336,7 @@ async function generateExerciseSequence({
       dimensions,
       outputPath: path.join(tempDir, `ex${exerciseNumber}-05-switch.png`)
     });
-    segments.push({ type: 'image', path: switchPath, duration: 3, audioUrl: AUDIO_CLIPS['switch-sides'] });
+    segments.push({ type: 'image', path: switchPath, duration: 6, audioUrl: AUDIO_CLIPS['switch-sides'] });
 
     // Second side
     const secondImageDataUri = secondImagePath ? await fileToDataUri(secondImagePath) : null;
@@ -395,7 +395,7 @@ async function generateExerciseSequence({
     });
   }
 
-  // Exercise Complete
+  // Exercise Complete (audio: 2s normal / 3s last, slide: 4s normal / 5s last)
   const isLastExercise = !nextExerciseDisplayName;
   const completePath = await renderScreenToImage({
     type: 'exercise-complete',
@@ -410,7 +410,7 @@ async function generateExerciseSequence({
     dimensions,
     outputPath: path.join(tempDir, `ex${exerciseNumber}-07-complete.png`)
   });
-  segments.push({ type: 'image', path: completePath, duration: 3, audioUrl: isLastExercise ? AUDIO_CLIPS['exercise-complete-last'] : AUDIO_CLIPS['exercise-complete'] });
+  segments.push({ type: 'image', path: completePath, duration: isLastExercise ? 5 : 4, audioUrl: isLastExercise ? AUDIO_CLIPS['exercise-complete-last'] : AUDIO_CLIPS['exercise-complete'] });
 
   return segments;
 }
@@ -425,7 +425,7 @@ async function generateOutroScreen({ routineName, exerciseCount, totalDuration, 
     outputPath: path.join(tempDir, 'outro-complete.png')
   });
 
-  return { type: 'image', path: outroPath, duration: 10, audioUrl: AUDIO_CLIPS['outro'] };
+  return { type: 'image', path: outroPath, duration: 9, audioUrl: AUDIO_CLIPS['outro'] };
 }
 
 function generateProgressDots(current, total) {
