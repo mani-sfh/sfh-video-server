@@ -11,11 +11,19 @@ const COLORS = {
   green: '#16a34a',
 };
 
+let _screenWidth = 1280;
+let _screenHeight = 720;
+
+function setDimensions(w, h) {
+  _screenWidth = w;
+  _screenHeight = h;
+}
+
 function baseHTML(bodyStyle, content) {
   return `<!DOCTYPE html><html><head><style>
 ${FONTS}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{width:1280px;height:720px;overflow:hidden;font-family:'Quicksand',sans-serif;font-weight:600;${bodyStyle}}
+body{width:${_screenWidth}px;height:${_screenHeight}px;overflow:hidden;font-family:'Quicksand',sans-serif;font-weight:600;${bodyStyle}}
 </style></head><body>${content}</body></html>`;
 }
 
@@ -284,7 +292,10 @@ export function routineComplete(routineName, exerciseCount, totalMinutes, level,
   );
 }
 
-export function getScreenHTML(type, data) {
+export function getScreenHTML(type, data, dimensions) {
+  if (dimensions) {
+    setDimensions(dimensions.width, dimensions.height);
+  }
   switch (type) {
     case 'title-card':
       return titleCard(data.routineName, data.exerciseCount, data.totalDuration, data.subtitle, data.level, data.condition);
@@ -299,7 +310,7 @@ export function getScreenHTML(type, data) {
     case 'your-turn':
       return yourTurn(data.exerciseNumber, data.totalExercises, data.exerciseName, data.duration, data.coachingCue, data.bilateral === 'yes', data.side, data.tags, data.focus, data.positionType);
     case 'practice-countdown':
-  return practiceFrame(data.exerciseNumber, data.totalExercises, data.exerciseName, data.imagePath, data.coachingCue, data.duration, data.timeDisplay || data.duration, data.side, data.tags);
+      return practiceFrame(data.exerciseNumber, data.totalExercises, data.exerciseName, data.imagePath, data.coachingCue, data.duration, data.timeDisplay || data.duration, data.side, data.tags);
     case 'switch-sides':
       return switchSides(data.exerciseNumber, data.totalExercises, data.exerciseName, data.secondSide);
     case 'exercise-complete':
