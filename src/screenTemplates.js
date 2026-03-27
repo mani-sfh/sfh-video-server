@@ -27,6 +27,17 @@ body{width:${_screenWidth}px;height:${_screenHeight}px;overflow:hidden;font-fami
 </style></head><body>${content}</body></html>`;
 }
 
+// SVG Icons
+const ICONS = {
+  clipboard: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${COLORS.crimson}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14l2 2 4-4"/></svg>`,
+  pause: `<svg width="22" height="22" viewBox="0 0 24 24" fill="${COLORS.crimson}" stroke="none"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,
+  play: `<svg width="32" height="32" viewBox="0 0 24 24" fill="${COLORS.teal}" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>`,
+  playWhite: `<svg width="60" height="60" viewBox="0 0 24 24" fill="rgba(255,255,255,0.6)" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>`,
+  checkTeal: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${COLORS.teal}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  checkWhite: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${COLORS.white}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  switchArrows: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="${COLORS.crimson}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8l4 4-4 4"/><path d="M2 12h20"/><path d="M6 16l-4-4 4-4"/></svg>`,
+};
+
 function sfhLogo(size = 'sm') {
   const fontSize = size === 'lg' ? '16px' : '14px';
   return `<p style="font-size:${fontSize};letter-spacing:4px;color:rgba(255,255,255,0.8);font-weight:700;text-transform:uppercase;">SENIOR FITNESS <span style="color:${COLORS.pinkLight};">HUB</span></p>`;
@@ -40,15 +51,15 @@ function progressDotsHTML(current, total) {
   let dots = '';
   for (let i = 1; i <= total; i++) {
     if (i < current) {
-      dots += `<span style="font-size:14px;font-weight:700;color:${COLORS.crimson};margin:0 3px;">&#10003;</span>`;
+      dots += `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${COLORS.crimson}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin:0 3px;vertical-align:middle;"><polyline points="20 6 9 17 4 12"/></svg>`;
     } else if (i === current) {
-      dots += `<span style="font-size:14px;font-weight:700;color:${COLORS.navy};margin:0 3px;">&#9679;</span>`;
+      dots += `<svg width="14" height="14" viewBox="0 0 24 24" style="margin:0 3px;vertical-align:middle;"><circle cx="12" cy="12" r="10" fill="${COLORS.navy}"/></svg>`;
     } else {
-      dots += `<span style="font-size:14px;font-weight:700;color:rgba(12,17,91,0.25);margin:0 3px;">&#9675;</span>`;
+      dots += `<svg width="14" height="14" viewBox="0 0 24 24" style="margin:0 3px;vertical-align:middle;"><circle cx="12" cy="12" r="9" fill="none" stroke="rgba(12,17,91,0.25)" stroke-width="2"/></svg>`;
     }
   }
   return `<div style="background:${COLORS.cream};border-bottom:2px solid rgba(12,17,91,0.08);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;width:100%;">
-    <div>${dots}</div>
+    <div style="display:flex;align-items:center;">${dots}</div>
     <span style="font-size:14px;font-weight:700;color:${COLORS.navy};">Exercise ${current} of ${total}</span>
   </div>`;
 }
@@ -94,21 +105,22 @@ export function trackerReminder() {
   return baseHTML(
     `background:${COLORS.cream};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px;`,
     `<div style="width:80px;height:80px;border-radius:50%;background:rgba(166,30,81,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-      <span style="font-size:40px;">&#128203;</span>
+      ${ICONS.clipboard}
     </div>
     <h2 style="font-family:Petrona,Georgia,serif;font-size:34px;font-weight:700;color:${COLORS.navy};margin-bottom:4px;">Haven't Downloaded Your</h2>
     <h2 style="font-family:Petrona,Georgia,serif;font-size:34px;font-weight:700;color:${COLORS.navy};">Progress Tracker Yet?</h2>
     <div style="width:64px;height:4px;background:${COLORS.crimson};border-radius:2px;margin:16px auto;"></div>
-    <p style="font-size:22px;color:${COLORS.crimson};font-weight:700;margin-bottom:12px;">&#9208; Pause the video now</p>
+    <p style="font-size:22px;color:${COLORS.crimson};font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;">${ICONS.pause} Pause the video now</p>
     <p style="font-size:16px;color:${COLORS.warmGray};font-weight:700;">Download your tracker and follow along.</p>`
   );
 }
 
 export function equipment(items) {
   const list = (items || ['Exercise mat or firm surface', 'Sturdy chair without wheels', 'Wall space for support', 'Comfortable, non-slip footwear']);
+  const bulletSVG = `<svg width="12" height="12" viewBox="0 0 24 24" style="flex-shrink:0;margin-right:18px;"><circle cx="12" cy="12" r="8" fill="${COLORS.crimson}"/></svg>`;
   const listHTML = list.map(item =>
     `<li style="font-size:34px;color:${COLORS.navy};font-weight:700;padding:14px 0;display:flex;align-items:center;">
-      <span style="color:#DC143C;font-size:36px;font-weight:700;margin-right:18px;">&#8226;</span>${esc(item)}
+      ${bulletSVG}${esc(item)}
     </li>`
   ).join('');
 
@@ -129,7 +141,7 @@ export function letsGo() {
     `background:linear-gradient(135deg,${COLORS.navy} 0%,${COLORS.crimson} 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px;`,
     `<h1 style="font-family:Petrona,Georgia,serif;font-size:42px;font-weight:700;color:${COLORS.white};">Let's Get Started!</h1>
     <p style="font-size:20px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:12px;">Follow along at your own pace.</p>
-    <p style="font-size:60px;color:rgba(255,255,255,0.6);margin-top:24px;">&#9654;</p>`
+    <div style="margin-top:24px;">${ICONS.playWhite}</div>`
   );
 }
 
@@ -181,7 +193,7 @@ export function yourTurn(exNum, total, name, timeDisplay, cue, bilateral, side, 
     `${progressDotsHTML(exNum, total)}
     <div style="flex:1;background:${COLORS.cream};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
       <div style="width:64px;height:64px;border-radius:50%;background:rgba(15,118,110,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-        <span style="font-size:32px;color:${COLORS.teal};">&#9654;</span>
+        ${ICONS.play}
       </div>
       ${positionHTML}
       <h2 style="font-family:Petrona,Georgia,serif;font-size:32px;font-weight:700;color:${COLORS.navy};margin-bottom:12px;">Now It's Your Turn!</h2>
@@ -231,7 +243,7 @@ export function switchSides(exNum, total, name, secondSide) {
     `${progressDotsHTML(exNum, total)}
     <div style="flex:1;background:${COLORS.cream};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
       <div style="width:64px;height:64px;border-radius:50%;background:rgba(166,30,81,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-        <span style="font-size:36px;color:${COLORS.crimson};">&#8596;</span>
+        ${ICONS.switchArrows}
       </div>
       <h2 style="font-family:Petrona,Georgia,serif;font-size:36px;font-weight:700;color:${COLORS.navy};margin-bottom:12px;">Switch Sides</h2>
       <span style="background:${COLORS.crimson};color:${COLORS.white};font-size:16px;font-weight:700;padding:6px 20px;border-radius:20px;">Now: ${sideLabel} SIDE</span>
@@ -257,7 +269,7 @@ export function exerciseComplete(exNum, total, name, nextName, nextPosition) {
     `${progressDotsHTML(exNum, total)}
     <div style="flex:1;background:${COLORS.cream};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
       <div style="width:64px;height:64px;border-radius:50%;background:rgba(15,118,110,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-        <span style="font-size:32px;color:${COLORS.teal};">&#10003;</span>
+        ${ICONS.checkTeal}
       </div>
       <h2 style="font-family:Petrona,Georgia,serif;font-size:28px;font-weight:700;color:${COLORS.crimson};margin-bottom:8px;">Exercise ${exNum} Complete!</h2>
       <p style="font-size:18px;color:${COLORS.navy};font-weight:700;margin-bottom:8px;">${esc(name)}</p>
@@ -278,7 +290,7 @@ export function routineComplete(routineName, exerciseCount, totalMinutes, level,
   return baseHTML(
     `background:linear-gradient(135deg,${COLORS.navy} 0%,${COLORS.teal} 50%,${COLORS.crimson} 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px;`,
     `<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-      <span style="font-size:32px;color:${COLORS.white};">&#10003;</span>
+      ${ICONS.checkWhite}
     </div>
     <h1 style="font-family:Petrona,Georgia,serif;font-size:38px;font-weight:700;color:${COLORS.white};margin-bottom:12px;">Routine Complete!</h1>
     ${levelHTML}
