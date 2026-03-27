@@ -193,7 +193,7 @@ export function practiceFrame(exNum, total, name, imageUrl, cue, timeRemaining, 
     : '';
 
   const imageHTML = imageUrl
-    ? `<img src="${imageUrl}" style="max-width:540px;max-height:400px;object-fit:contain;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.1);" />`
+    ? `<img src="${imageUrl}" style="max-width:640px;max-height:420px;object-fit:contain;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.1);" />`
     : `<span style="font-size:16px;color:rgba(12,17,91,0.3);font-weight:700;">NO IMAGE</span>`;
 
   const cueHTML = cue
@@ -203,15 +203,15 @@ export function practiceFrame(exNum, total, name, imageUrl, cue, timeRemaining, 
   return baseHTML(
     `display:flex;flex-direction:column;`,
     `${progressDotsHTML(exNum, total)}
-    <div style="flex:1;background:${COLORS.cream};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 40px;position:relative;">
+    <div style="flex:1;background:${COLORS.cream};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 40px;position:relative;">
       ${sideBadge}
-      <p style="font-family:Petrona,Georgia,serif;font-size:24px;font-weight:700;color:${COLORS.navy};margin-bottom:16px;">${esc(name)}</p>
-      <div style="display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+      <p style="font-family:Petrona,Georgia,serif;font-size:22px;font-weight:700;color:${COLORS.navy};margin-bottom:8px;">${esc(name)}</p>
+      <div style="display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
         ${imageHTML}
       </div>
-      <span style="background:${COLORS.teal};color:${COLORS.white};font-size:16px;font-weight:700;padding:8px 20px;border-radius:20px;">${esc(String(totalDuration))}</span>
+      <span style="background:${COLORS.teal};color:${COLORS.white};font-size:14px;font-weight:700;padding:6px 16px;border-radius:20px;">${esc(String(totalDuration))}</span>
       ${cueHTML}
-      <p style="position:absolute;bottom:12px;font-size:14px;letter-spacing:3px;color:rgba(12,17,91,0.3);font-weight:700;text-transform:uppercase;">SENIOR FITNESS <span style="color:${COLORS.crimson};">HUB</span></p>
+      <p style="position:absolute;bottom:8px;font-size:12px;letter-spacing:3px;color:rgba(12,17,91,0.25);font-weight:700;text-transform:uppercase;">SENIOR FITNESS <span style="color:${COLORS.crimson};">HUB</span></p>
     </div>`
   );
 }
