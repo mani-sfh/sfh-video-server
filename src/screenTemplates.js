@@ -299,7 +299,7 @@ export function getScreenHTML(type, data) {
     case 'your-turn':
       return yourTurn(data.exerciseNumber, data.totalExercises, data.exerciseName, data.duration, data.coachingCue, data.bilateral === 'yes', data.side, data.tags, data.focus, data.positionType);
     case 'practice-countdown':
-      return practiceFrame(data.exerciseNumber, data.totalExercises, data.exerciseName, data.imagePath, data.coachingCue, data.duration, data.duration, data.side, data.tags);
+  return practiceFrame(data.exerciseNumber, data.totalExercises, data.exerciseName, data.imagePath, data.coachingCue, data.duration, data.timeDisplay || data.duration, data.side, data.tags);
     case 'switch-sides':
       return switchSides(data.exerciseNumber, data.totalExercises, data.exerciseName, data.secondSide);
     case 'exercise-complete':
