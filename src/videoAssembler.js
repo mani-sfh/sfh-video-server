@@ -134,29 +134,43 @@ async function imageToVideo(imagePath, outputPath, duration, width, height, audi
       .inputOptions(['-loop 1', `-t ${duration}`]);
 
     if (audioPath) {
-      // Use the downloaded audio clip
+      // Use downloaded audio clip — do NOT use -shortest, use -t to control duration
       cmd.input(audioPath);
+      cmd.outputOptions([
+        '-threads 1',
+        '-c:v libx264',
+        '-c:a aac',
+        `-ar ${AUDIO_SAMPLE_RATE}`,
+        `-b:a ${AUDIO_BITRATE}`,
+        '-ac 2',
+        `-t ${duration}`,
+        `-preset ${FFMPEG_PRESET}`,
+        `-crf ${FFMPEG_CRF}`,
+        '-pix_fmt yuv420p',
+        `-r ${STATIC_FPS}`,
+        `-vf scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black`
+      ]);
     } else {
       // Silent audio
       cmd.input(`anullsrc=channel_layout=${AUDIO_CHANNELS}:sample_rate=${AUDIO_SAMPLE_RATE}`)
         .inputOptions(['-f lavfi', `-t ${duration}`]);
+      cmd.outputOptions([
+        '-threads 1',
+        '-c:v libx264',
+        '-c:a aac',
+        `-ar ${AUDIO_SAMPLE_RATE}`,
+        `-b:a ${AUDIO_BITRATE}`,
+        '-ac 2',
+        '-shortest',
+        `-preset ${FFMPEG_PRESET}`,
+        `-crf ${FFMPEG_CRF}`,
+        '-pix_fmt yuv420p',
+        `-r ${STATIC_FPS}`,
+        `-vf scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black`
+      ]);
     }
 
-    cmd.outputOptions([
-      '-threads 1',
-      '-c:v libx264',
-      '-c:a aac',
-      `-ar ${AUDIO_SAMPLE_RATE}`,
-      `-b:a ${AUDIO_BITRATE}`,
-      '-ac 2',
-      '-shortest',
-      `-preset ${FFMPEG_PRESET}`,
-      `-crf ${FFMPEG_CRF}`,
-      '-pix_fmt yuv420p',
-      `-r ${STATIC_FPS}`,
-      `-vf scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black`
-    ])
-      .output(outputPath)
+    cmd.output(outputPath)
       .on('end', () => resolve(outputPath))
       .on('error', reject)
       .run();
@@ -223,9 +237,6 @@ async function normalizeVideo(inputPath, outputPath, width, height) {
       ...audioFilters,
     ])
       .output(outputPath)
-      .on('start', (cmd) => {
-        console.log('Normalizing video:', cmd);
-      })
       .on('end', () => resolve(outputPath))
       .on('error', reject)
       .run();
@@ -271,9 +282,6 @@ async function createCountdownVideo(segment, outputPath, width, height, resoluti
         `-vf scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=0xFFFBF7,${textFilter},${progressBarBorder},${progressBarFilter}`
       ])
       .output(outputPath)
-      .on('start', (cmd) => {
-        console.log('Creating countdown video:', cmd);
-      })
       .on('end', () => resolve(outputPath))
       .on('error', reject)
       .run();
