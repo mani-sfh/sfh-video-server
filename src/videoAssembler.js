@@ -250,7 +250,7 @@ async function createCountdownVideo(segment, outputPath, width, height, resoluti
   const barThickness = resolution === '1080p' ? 10 : 8;
   const margin = resolution === '1080p' ? 40 : 28;
   const boxPad = resolution === '1080p' ? 28 : 22;
-  const timerY = resolution === '1080p' ? 36 : 24;
+  const timerY = resolution === '1080p' ? 60 : 46;
 
   const textFilter = `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='%{eif\\:${duration}-t\\:d}':fontcolor=0xFFFFFF:fontsize=${fontSize}:x=w-text_w-${margin}:y=${timerY}:box=1:boxcolor=0x0C115B@0.92:boxborderw=${boxPad}:borderw=0`;
 
