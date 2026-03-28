@@ -78,9 +78,9 @@ function esc(str) {
 
 const CHARACTER_OVERLAY_URL = 'https://assets.cdn.filesafe.space/Tg27dC86DFaiDsilRpae/media/69c71bf95eea83c015473d3c.png';
 
-export function thumbnail(routineName, totalMinutes, overlayImageUrl) {
-  const durationBadge = esc(String(totalMinutes));
-  const nameLines = esc(routineName).toUpperCase();
+export function thumbnail(routineName, totalMinutes, overlayImageUrl, badgeText, titleText) {
+  const durationBadge = esc(badgeText || String(totalMinutes));
+  const nameLines = esc(titleText || routineName).toUpperCase();
   const personUrl = overlayImageUrl || CHARACTER_OVERLAY_URL;
   const is1080 = _screenWidth >= 1920;
 
@@ -344,7 +344,7 @@ export function getScreenHTML(type, data, dimensions) {
   }
   switch (type) {
     case 'thumbnail':
-      return thumbnail(data.routineName, data.totalDuration, data.overlayImageUrl);
+      return thumbnail(data.routineName, data.totalDuration, data.overlayImageUrl, data.badgeText, data.titleText);
     case 'title-card':
       return titleCard(data.routineName, data.exerciseCount, data.totalDuration, data.subtitle, data.level, data.condition);
     case 'tracker-reminder':
