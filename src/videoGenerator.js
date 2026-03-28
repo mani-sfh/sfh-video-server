@@ -50,7 +50,7 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
 
     // Step 2: Generate intro screens
     await updateJobStatus(supabase, jobId, 'processing', 'Creating intro screens', 15);
-    const introScreens = await generateIntroScreens({
+    const { screens: introScreens, thumbnailPath } = await generateIntroScreens({
       routineName,
       exerciseCount: exercises.length,
       totalDuration,
@@ -64,6 +64,21 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
       resolution,
       tempDir
     });
+
+    // Upload thumbnail PNG to Supabase storage
+    let thumbnailUrl = null;
+    try {
+      const thumbBuffer = await fs.readFile(thumbnailPath);
+      const thumbFilename = `thumbnail_${jobId}.png`;
+      const thumbStoragePath = `thumbnails/${thumbFilename}`;
+      const { error: thumbError } = await supabase.storage
+        .from('videos')
+        .upload(thumbStoragePath, thumbBuffer, { contentType: 'image/png', upsert: true });
+      if (!thumbError) {
+        const { data: thumbData } = supabase.storage.from('videos').getPublicUrl(thumbStoragePath);
+        thumbnailUrl = thumbData.publicUrl;
+      }
+    } catch (e) { console.error('Thumbnail upload error:', e); }
 
     // Step 3: Generate exercise sequences
     const exerciseSegments = [];
@@ -138,6 +153,7 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
       .update({
         status: 'completed',
         output_url: videoUrl,
+        thumbnail_url: thumbnailUrl,
         file_size_mb: fileSizeMB,
         completed_at: new Date().toISOString()
       })
@@ -227,7 +243,7 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
   });
   screens.push({ type: 'image', path: letsStartPath, duration: 10, audioUrl: AUDIO_CLIPS['lets-start'] });
 
-  return screens;
+  return { screens, thumbnailPath };
 }
 
 async function generateExerciseSequence({
