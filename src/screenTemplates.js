@@ -95,8 +95,8 @@ body{width:${_screenWidth}px;height:${_screenHeight}px;overflow:hidden;font-fami
 .content{position:absolute;left:6%;top:50%;transform:translateY(-50%);max-width:52%;z-index:5;}
 .badge{display:inline-block;background:#E65100;color:#fff;font-family:Impact,'Arial Black',Arial,sans-serif;font-weight:900;font-size:${is1080 ? '40px' : '28px'};padding:${is1080 ? '8px 22px' : '6px 16px'};border-radius:6px;margin-bottom:${is1080 ? '18px' : '12px'};letter-spacing:1px;}
 .title{color:#ffffff;font-family:Impact,'Arial Black',Arial,sans-serif;font-weight:900;font-size:${is1080 ? '80px' : '54px'};line-height:1.05;text-transform:uppercase;letter-spacing:2px;text-shadow:0 3px 30px rgba(0,0,0,0.7);}
-.person{position:absolute;right:2%;bottom:0;height:92%;z-index:2;}
-.person img{height:100%;width:auto;object-fit:contain;object-position:bottom right;}
+.person{position:absolute;right:-2%;bottom:-2%;width:55%;height:104%;z-index:2;-webkit-mask-image:linear-gradient(to right,transparent 0%,black 25%),linear-gradient(to top,black 90%,transparent 100%);-webkit-mask-composite:destination-in;mask-image:linear-gradient(to right,transparent 0%,black 25%),linear-gradient(to top,black 90%,transparent 100%);mask-composite:intersect;}
+.person img{width:100%;height:100%;object-fit:contain;object-position:bottom right;}
 </style></head><body>
 <div class="bg"></div>
 <div class="glow"></div>
