@@ -253,6 +253,8 @@ async function generateExerciseSequence({
   const isBilateral = exercise.bilateral === 'yes';
 
   // Watch and Learn (audio: 4s, slide: 6s)
+  const watchImagePath = assets.mainImagePath || assets.rightImagePath || assets.leftImagePath;
+  const watchImageDataUri = watchImagePath ? await fileToDataUri(watchImagePath) : null;
   const watchLearnPath = await renderScreenToImage({
     type: 'watch-learn',
     data: {
@@ -264,7 +266,8 @@ async function generateExerciseSequence({
       focus: exercise.focus,
       positionType: exercise.position_type,
       tags,
-      progressDots
+      progressDots,
+      imageUrl: watchImageDataUri
     },
     dimensions,
     outputPath: path.join(tempDir, `ex${exerciseNumber}-01-watch.png`)
