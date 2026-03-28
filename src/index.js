@@ -37,7 +37,7 @@ app.get('/health', (req, res) => {
 
 app.post('/api/video/generate', async (req, res) => {
   try {
-    const { jobId, routineName, exercises, resolution = '720p', totalDuration, equipment, subtitle, level, condition } = req.body;
+    const { jobId, routineName, exercises, resolution = '720p', totalDuration, equipment, subtitle, level, condition, thumbnailImageUrl } = req.body;
 
     if (!jobId || !routineName || !exercises || !Array.isArray(exercises)) {
       return res.status(400).json({
@@ -69,6 +69,7 @@ app.post('/api/video/generate', async (req, res) => {
       subtitle,
       level,
       condition,
+      thumbnailImageUrl,
       supabase: sb
     }).catch(error => {
       console.error('Video generation failed:', error);
