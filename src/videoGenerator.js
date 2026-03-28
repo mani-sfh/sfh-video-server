@@ -29,7 +29,7 @@ async function fileToDataUri(filePath) {
   return `data:${mime};base64,${buffer.toString('base64')}`;
 }
 
-export async function generateVideo({ jobId, routineName, exercises, resolution, totalDuration, equipment, subtitle, level, condition, supabase }) {
+export async function generateVideo({ jobId, routineName, exercises, resolution, totalDuration, equipment, subtitle, level, condition, thumbnailImageUrl, supabase }) {
   const tempDir = path.join(process.cwd(), 'temp', jobId);
 
   try {
@@ -58,6 +58,7 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
       subtitle,
       level,
       condition,
+      thumbnailImageUrl,
       resolution,
       tempDir
     });
@@ -179,14 +180,14 @@ async function updateJobStatus(supabase, jobId, status, currentStep, progressPer
     .eq('id', jobId);
 }
 
-async function generateIntroScreens({ routineName, exerciseCount, totalDuration, equipment, subtitle, level, condition, resolution, tempDir }) {
+async function generateIntroScreens({ routineName, exerciseCount, totalDuration, equipment, subtitle, level, condition, thumbnailImageUrl, resolution, tempDir }) {
   const screens = [];
   const dimensions = resolution === '1080p' ? { width: 1920, height: 1080 } : { width: 1280, height: 720 };
 
   // Thumbnail (2 seconds, no audio — YouTube-style cover frame)
   const thumbnailPath = await renderScreenToImage({
     type: 'thumbnail',
-    data: { routineName, totalDuration },
+    data: { routineName, totalDuration, overlayImageUrl: thumbnailImageUrl },
     dimensions,
     outputPath: path.join(tempDir, 'intro-00-thumbnail.png')
   });
