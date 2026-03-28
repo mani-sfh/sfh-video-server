@@ -192,7 +192,7 @@ export function watchIntro(exNum, total, name, timeDisplay, cue, tags, focus, po
     ? `<span style="display:inline-block;background:rgba(12,17,91,0.08);color:${COLORS.navy};font-size:11px;font-weight:700;padding:3px 12px;border-radius:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">${esc(positionType)}</span>`
     : '';
   const imageHTML = imageUrl
-    ? `<img src="${imageUrl}" alt="" style="width:180px;height:110px;object-fit:cover;border-radius:10px;border:3px solid ${COLORS.crimson};margin-bottom:12px;" />`
+    ? `<img src="${imageUrl}" alt="" style="width:180px;height:110px;object-fit:cover;border-radius:10px;margin-bottom:12px;" />`
     : '';
 
   return baseHTML(
