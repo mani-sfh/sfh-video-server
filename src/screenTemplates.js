@@ -78,27 +78,29 @@ function esc(str) {
 
 const CHARACTER_OVERLAY_URL = 'https://assets.cdn.filesafe.space/Tg27dC86DFaiDsilRpae/media/69c71bf95eea83c015473d3c.png';
 
-export function thumbnail(routineName, totalMinutes) {
+export function thumbnail(routineName, totalMinutes, overlayImageUrl) {
   const durationBadge = esc(String(totalMinutes));
   const nameLines = esc(routineName).toUpperCase();
+  const personUrl = overlayImageUrl || CHARACTER_OVERLAY_URL;
+  const is1080 = _screenWidth >= 1920;
 
   return `<!DOCTYPE html><html><head><style>
-${FONTS}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{width:${_screenWidth}px;height:${_screenHeight}px;overflow:hidden;font-family:'Arial',Helvetica,sans-serif;background:#080808;}
+@font-face{font-family:'Impact';src:local('Impact'),local('Arial Black');}
+body{width:${_screenWidth}px;height:${_screenHeight}px;overflow:hidden;font-family:Impact,'Arial Black',Arial,sans-serif;background:#080808;}
 .bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0a0a 0%,#1a1018 40%,#0f0a12 100%);}
 .glow{position:absolute;right:5%;top:-10%;width:50%;height:120%;background:radial-gradient(ellipse at 50% 50%,rgba(166,30,81,0.22) 0%,transparent 60%);}
 .vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,transparent 30%,rgba(0,0,0,0.5) 100%);z-index:3;}
-.accent{position:absolute;left:4.2%;top:50%;transform:translateY(-50%);width:5px;height:30%;background:${COLORS.crimson};border-radius:3px;z-index:4;}
-.content{position:absolute;left:6%;top:50%;transform:translateY(-50%);max-width:50%;z-index:5;}
-.badge{display:inline-block;background:#E65100;color:#fff;font-weight:900;font-size:${_screenWidth >= 1920 ? '32px' : '22px'};padding:${_screenWidth >= 1920 ? '8px 18px' : '6px 14px'};border-radius:5px;margin-bottom:${_screenWidth >= 1920 ? '16px' : '10px'};letter-spacing:0.5px;}
-.title{color:#ffffff;font-weight:900;font-size:${_screenWidth >= 1920 ? '56px' : '38px'};line-height:1.1;text-transform:uppercase;letter-spacing:1.5px;text-shadow:0 2px 30px rgba(0,0,0,0.6);}
+.accent{position:absolute;left:4.2%;top:50%;transform:translateY(-50%);width:${is1080 ? '6px' : '5px'};height:30%;background:${COLORS.crimson};border-radius:3px;z-index:4;}
+.content{position:absolute;left:6%;top:50%;transform:translateY(-50%);max-width:52%;z-index:5;}
+.badge{display:inline-block;background:#E65100;color:#fff;font-family:Impact,'Arial Black',Arial,sans-serif;font-weight:900;font-size:${is1080 ? '40px' : '28px'};padding:${is1080 ? '8px 22px' : '6px 16px'};border-radius:6px;margin-bottom:${is1080 ? '18px' : '12px'};letter-spacing:1px;}
+.title{color:#ffffff;font-family:Impact,'Arial Black',Arial,sans-serif;font-weight:900;font-size:${is1080 ? '80px' : '54px'};line-height:1.05;text-transform:uppercase;letter-spacing:2px;text-shadow:0 3px 30px rgba(0,0,0,0.7);}
 .person{position:absolute;right:2%;bottom:0;height:92%;z-index:2;}
 .person img{height:100%;width:auto;object-fit:contain;object-position:bottom right;}
 </style></head><body>
 <div class="bg"></div>
 <div class="glow"></div>
-<div class="person"><img src="${CHARACTER_OVERLAY_URL}" alt="" /></div>
+<div class="person"><img src="${personUrl}" alt="" /></div>
 <div class="vignette"></div>
 <div class="accent"></div>
 <div class="content">
@@ -342,7 +344,7 @@ export function getScreenHTML(type, data, dimensions) {
   }
   switch (type) {
     case 'thumbnail':
-      return thumbnail(data.routineName, data.totalDuration);
+      return thumbnail(data.routineName, data.totalDuration, data.overlayImageUrl);
     case 'title-card':
       return titleCard(data.routineName, data.exerciseCount, data.totalDuration, data.subtitle, data.level, data.condition);
     case 'tracker-reminder':
