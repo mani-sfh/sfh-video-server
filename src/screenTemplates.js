@@ -179,17 +179,20 @@ export function letsGo() {
   );
 }
 
-export function watchIntro(exNum, total, name, timeDisplay, cue, tags, focus, positionType) {
+export function watchIntro(exNum, total, name, timeDisplay, cue, tags, focus, positionType, imageUrl) {
   const cueHTML = cue
     ? `<div style="border-left:4px solid ${COLORS.crimson};background:rgba(166,30,81,0.05);padding:10px 16px;border-radius:0 8px 8px 0;margin-top:12px;max-width:85%;">
         <p style="font-size:14px;color:${COLORS.navy};font-weight:700;text-align:center;">"${esc(cue)}"</p>
       </div>`
     : '';
   const focusHTML = focus
-    ? `<p style="font-size:14px;color:${COLORS.warmGray};font-weight:600;font-style:italic;margin-top:8px;max-width:80%;text-align:center;line-height:1.4;">${esc(focus)}</p>`
+    ? `<p style="font-size:18px;color:${COLORS.warmGray};font-weight:600;margin-top:10px;max-width:80%;text-align:center;line-height:1.4;">${esc(focus)}</p>`
     : '';
   const positionHTML = positionType
     ? `<span style="display:inline-block;background:rgba(12,17,91,0.08);color:${COLORS.navy};font-size:11px;font-weight:700;padding:3px 12px;border-radius:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">${esc(positionType)}</span>`
+    : '';
+  const imageHTML = imageUrl
+    ? `<img src="${imageUrl}" alt="" style="width:180px;height:110px;object-fit:cover;border-radius:10px;border:3px solid ${COLORS.crimson};margin-bottom:12px;" />`
     : '';
 
   return baseHTML(
@@ -200,10 +203,11 @@ export function watchIntro(exNum, total, name, timeDisplay, cue, tags, focus, po
       ${positionHTML}
       <h2 style="font-family:Petrona,Georgia,serif;font-size:22px;font-weight:700;color:${COLORS.navy};margin-bottom:8px;">Watch and Learn</h2>
       <h3 style="font-family:Petrona,Georgia,serif;font-size:28px;font-weight:700;color:${COLORS.navy};margin-bottom:12px;text-align:center;">${esc(name)}</h3>
+      ${imageHTML}
       <span style="background:${COLORS.teal};color:${COLORS.white};font-size:14px;font-weight:700;padding:6px 16px;border-radius:20px;margin-bottom:12px;">${esc(timeDisplay)}</span>
       ${tagsHTML(tags)}
-      ${cueHTML}
       ${focusHTML}
+      ${cueHTML}
     </div>`
   );
 }
@@ -322,7 +326,7 @@ export function routineComplete(routineName, exerciseCount, totalMinutes, level,
     : '';
 
   return baseHTML(
-    `background:linear-gradient(135deg,${COLORS.navy} 0%,${COLORS.teal} 50%,${COLORS.crimson} 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px;`,
+    `background:linear-gradient(135deg,${COLORS.navy} 0%,${COLORS.crimson} 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px;`,
     `<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
       ${ICONS.checkWhite}
     </div>
@@ -354,7 +358,7 @@ export function getScreenHTML(type, data, dimensions) {
     case 'lets-start':
       return letsGo();
     case 'watch-learn':
-      return watchIntro(data.exerciseNumber, data.totalExercises, data.exerciseName, data.duration, data.coachingCue, data.tags, data.focus, data.positionType);
+      return watchIntro(data.exerciseNumber, data.totalExercises, data.exerciseName, data.duration, data.coachingCue, data.tags, data.focus, data.positionType, data.imageUrl);
     case 'your-turn':
       return yourTurn(data.exerciseNumber, data.totalExercises, data.exerciseName, data.duration, data.coachingCue, data.bilateral === 'yes', data.side, data.tags, data.focus, data.positionType);
     case 'practice-countdown':
