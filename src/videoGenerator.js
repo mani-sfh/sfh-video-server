@@ -183,6 +183,15 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
   const screens = [];
   const dimensions = resolution === '1080p' ? { width: 1920, height: 1080 } : { width: 1280, height: 720 };
 
+  // Thumbnail (2 seconds, no audio — YouTube-style cover frame)
+  const thumbnailPath = await renderScreenToImage({
+    type: 'thumbnail',
+    data: { routineName, totalDuration },
+    dimensions,
+    outputPath: path.join(tempDir, 'intro-00-thumbnail.png')
+  });
+  screens.push({ type: 'image', path: thumbnailPath, duration: 2 });
+
   const titleCardPath = await renderScreenToImage({
     type: 'title-card',
     data: { routineName, exerciseCount, totalDuration, subtitle, level, condition },
