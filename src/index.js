@@ -122,6 +122,37 @@ app.post('/api/vimeo/upload', async (req, res) => {
 
     console.log(`[Vimeo] Uploading: ${title || 'Untitled'}`);
 
+    // Build request body
+    const projectUri = process.env.VIMEO_PROJECT_URI; // e.g. "/users/251550913/projects/28754524"
+    const vimeoBody = {
+      upload: { approach: 'pull', link: videoUrl },
+      name: title || 'SFH Routine',
+      description: description || 'Senior Fitness Hub follow-along routine',
+      privacy: {
+        view: 'disable',
+        embed: 'whitelist',
+        download: false,
+      },
+      embed: {
+        buttons: { like: false, watchlater: false, share: false },
+        logos: { vimeo: false },
+        title: { name: 'hide', owner: 'hide', portrait: 'hide' },
+      },
+      embed_domains: [
+        'learn.senior-fitness-hub.com',
+        'seniorfitnesshub.com',
+        'senior-fitness-hub.com',
+        'pages.senior-fitness-hub.com',
+        'app.membervault.co',
+      ],
+    };
+
+    // Add to existing folder if configured
+    if (projectUri) {
+      vimeoBody.folder_uri = projectUri;
+      console.log(`[Vimeo] Target folder: ${projectUri}`);
+    }
+
     // Create video via pull approach — Vimeo fetches from URL
     const vimeoRes = await fetch('https://api.vimeo.com/me/videos', {
       method: 'POST',
@@ -130,28 +161,7 @@ app.post('/api/vimeo/upload', async (req, res) => {
         'Content-Type': 'application/json',
         'Accept': 'application/vnd.vimeo.*+json;version=3.4',
       },
-      body: JSON.stringify({
-        upload: { approach: 'pull', link: videoUrl },
-        name: title || 'SFH Routine',
-        description: description || 'Senior Fitness Hub follow-along routine',
-        privacy: {
-          view: 'disable',
-          embed: 'whitelist',
-          download: false,
-        },
-        embed: {
-          buttons: { like: false, watchlater: false, share: false },
-          logos: { vimeo: false },
-          title: { name: 'hide', owner: 'hide', portrait: 'hide' },
-        },
-        embed_domains: [
-          'learn.senior-fitness-hub.com',
-          'seniorfitnesshub.com',
-          'senior-fitness-hub.com',
-          'pages.senior-fitness-hub.com',
-          'app.membervault.co',
-        ],
-      }),
+      body: JSON.stringify(vimeoBody),
     });
 
     if (!vimeoRes.ok) {
@@ -167,27 +177,6 @@ app.post('/api/vimeo/upload', async (req, res) => {
     const playerEmbed = vimeoData.embed?.html || null;
 
     console.log(`[Vimeo] Upload started: ${vimeoLink} (processing will continue on Vimeo)`);
-
-    // Add to Vimeo project/folder if configured
-    const projectUri = process.env.VIMEO_PROJECT_URI; // e.g. "/users/251550913/projects/28754524"
-    if (projectUri && vimeoId) {
-      try {
-        const projRes = await fetch(`https://api.vimeo.com${projectUri}/videos/${vimeoId}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `bearer ${vimeoToken}`,
-            'Accept': 'application/vnd.vimeo.*+json;version=3.4',
-          },
-        });
-        if (projRes.ok) {
-          console.log(`[Vimeo] Added to project: ${projectUri}`);
-        } else {
-          console.warn(`[Vimeo] Project add failed: ${projRes.status} — continuing without project`);
-        }
-      } catch (projErr) {
-        console.warn(`[Vimeo] Project add error: ${projErr.message} — continuing without project`);
-      }
-    }
 
     res.json({
       success: true,
