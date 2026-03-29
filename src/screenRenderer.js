@@ -44,7 +44,7 @@ async function getReusablePage(dimensions) {
   await sharedPage.setViewport({
     width: dimensions.width,
     height: dimensions.height,
-    deviceScaleFactor: 1
+    deviceScaleFactor: 2
   });
   return sharedPage;
 }
@@ -77,7 +77,7 @@ export async function renderScreenToImage({ type, data, dimensions, outputPath }
   await page.screenshot({
     path: jpegPath,
     type: 'jpeg',
-    quality: 90,
+    quality: 95,
     clip: { x: 0, y: 0, width: dimensions.width, height: dimensions.height }
   });
 
