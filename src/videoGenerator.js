@@ -50,7 +50,7 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
 
     // Step 2: Generate intro screens
     await updateJobStatus(supabase, jobId, 'processing', 'Creating intro screens', 15);
-    const { screens: introScreens, thumbnailPath } = await generateIntroScreens({
+    const introScreens = await generateIntroScreens({
       routineName,
       exerciseCount: exercises.length,
       totalDuration,
@@ -64,21 +64,6 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
       resolution,
       tempDir
     });
-
-    // Upload thumbnail PNG to Supabase storage
-    let thumbnailUrl = null;
-    try {
-      const thumbBuffer = await fs.readFile(thumbnailPath);
-      const thumbFilename = `thumbnail_${jobId}.png`;
-      const thumbStoragePath = `thumbnails/${thumbFilename}`;
-      const { error: thumbError } = await supabase.storage
-        .from('videos')
-        .upload(thumbStoragePath, thumbBuffer, { contentType: 'image/png', upsert: true });
-      if (!thumbError) {
-        const { data: thumbData } = supabase.storage.from('videos').getPublicUrl(thumbStoragePath);
-        thumbnailUrl = thumbData.publicUrl;
-      }
-    } catch (e) { console.error('Thumbnail upload error:', e); }
 
     // Step 3: Generate exercise sequences
     const exerciseSegments = [];
@@ -153,7 +138,6 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
       .update({
         status: 'completed',
         output_url: videoUrl,
-        thumbnail_url: thumbnailUrl,
         file_size_mb: fileSizeMB,
         completed_at: new Date().toISOString()
       })
@@ -217,7 +201,7 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
     dimensions,
     outputPath: path.join(tempDir, 'intro-01-title.png')
   });
-  screens.push({ type: 'image', path: titleCardPath, duration: 10, audioUrl: AUDIO_CLIPS['title-card'] });
+  screens.push({ type: 'image', path: titleCardPath, duration: 6, audioUrl: AUDIO_CLIPS['title-card'] });
 
   const trackerReminderPath = await renderScreenToImage({
     type: 'tracker-reminder',
@@ -225,7 +209,7 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
     dimensions,
     outputPath: path.join(tempDir, 'intro-02-tracker.png')
   });
-  screens.push({ type: 'image', path: trackerReminderPath, duration: 10, audioUrl: AUDIO_CLIPS['tracker-reminder'] });
+  screens.push({ type: 'image', path: trackerReminderPath, duration: 7, audioUrl: AUDIO_CLIPS['tracker-reminder'] });
 
   const equipmentPath = await renderScreenToImage({
     type: 'equipment',
@@ -233,7 +217,7 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
     dimensions,
     outputPath: path.join(tempDir, 'intro-03-equipment.png')
   });
-  screens.push({ type: 'image', path: equipmentPath, duration: 10, audioUrl: AUDIO_CLIPS['equipment'] });
+  screens.push({ type: 'image', path: equipmentPath, duration: 6, audioUrl: AUDIO_CLIPS['equipment'] });
 
   const letsStartPath = await renderScreenToImage({
     type: 'lets-start',
@@ -241,9 +225,9 @@ async function generateIntroScreens({ routineName, exerciseCount, totalDuration,
     dimensions,
     outputPath: path.join(tempDir, 'intro-04-start.png')
   });
-  screens.push({ type: 'image', path: letsStartPath, duration: 10, audioUrl: AUDIO_CLIPS['lets-start'] });
+  screens.push({ type: 'image', path: letsStartPath, duration: 6, audioUrl: AUDIO_CLIPS['lets-start'] });
 
-  return { screens, thumbnailPath };
+  return screens;
 }
 
 async function generateExerciseSequence({
