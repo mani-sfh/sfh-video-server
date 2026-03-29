@@ -9,7 +9,7 @@ const AUDIO_SAMPLE_RATE = 48000;
 const AUDIO_CHANNELS = 'stereo';
 const AUDIO_BITRATE = '128k';
 const FFMPEG_PRESET = 'ultrafast';
-const FFMPEG_CRF = '32';
+const FFMPEG_CRF = process.env.FFMPEG_CRF || '23';
 const SEGMENT_CONCURRENCY = 4;
 const STATIC_FPS = 15;
 
@@ -245,17 +245,18 @@ async function normalizeVideo(inputPath, outputPath, width, height) {
 
 async function createCountdownVideo(segment, outputPath, width, height, resolution) {
   const { imagePath, duration } = segment;
-  const fontSize = resolution === '1080p' ? 72 : 52;
-  const barSize = resolution === '1080p' ? 180 : 130;
-  const barThickness = resolution === '1080p' ? 10 : 8;
-  const margin = resolution === '1080p' ? 40 : 28;
-  const boxPad = resolution === '1080p' ? 28 : 22;
-  const timerY = resolution === '1080p' ? 60 : 46;
+  const fontSize = resolution === '1080p' ? 64 : 48;
+  const barSize = resolution === '1080p' ? 300 : 220;
+  const barThickness = resolution === '1080p' ? 8 : 6;
+  const boxPad = resolution === '1080p' ? 36 : 28;
+  const timerY = resolution === '1080p' ? 40 : 30;
 
-  const textFilter = `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='%{eif\\:${duration}-t\\:d}':fontcolor=0xFFFFFF:fontsize=${fontSize}:x=w-text_w-${margin}:y=${timerY}:box=1:boxcolor=0x0C115B@0.92:boxborderw=${boxPad}:borderw=0`;
+  // Timer centered at top with navy circle (large padding creates circle-like badge)
+  const textFilter = `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='%{eif\\:${duration}-t\\:d}':fontcolor=0xFFFFFF:fontsize=${fontSize}:x=(w-text_w)/2:y=${timerY}:box=1:boxcolor=0x0C115B@0.92:boxborderw=${boxPad}:borderw=0`;
 
-  const barX = `w-${barSize}-${margin}`;
-  const barY = `h-${barThickness}-${margin}`;
+  // Progress bar centered at bottom
+  const barX = `(w-${barSize})/2`;
+  const barY = `h-${barThickness}-30`;
   const progressBarBorder = `drawbox=x=${barX}:y=${barY}:w=${barSize}:h=${barThickness}:color=0x0C115B@0.15:t=fill`;
   const progressBarFilter = `drawbox=x=${barX}:y=${barY}:w=${barSize}*t/${duration}:h=${barThickness}:color=0xA61E51:t=fill`;
 
