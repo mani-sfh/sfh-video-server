@@ -143,7 +143,7 @@ app.get('/api/vimeo/folders', async (req, res) => {
 // ─── Vimeo Upload (pull approach) ───
 app.post('/api/vimeo/upload', async (req, res) => {
   try {
-    const { videoUrl, title, description } = req.body;
+    const { videoUrl, title, description, thumbnailUrl } = req.body;
     const vimeoToken = process.env.VIMEO_ACCESS_TOKEN;
 
     if (!vimeoToken) {
@@ -224,6 +224,50 @@ app.post('/api/vimeo/upload', async (req, res) => {
         } catch (projErr) {
           console.warn(`[Vimeo] Folder add error: ${projErr.message}`);
         }
+      }
+    }
+
+    // Step 3: Set custom thumbnail if provided
+    if (thumbnailUrl && vimeoId) {
+      try {
+        console.log(`[Vimeo] Setting custom thumbnail...`);
+
+        // Download the thumbnail image
+        const imgRes = await fetch(thumbnailUrl);
+        if (!imgRes.ok) throw new Error(`Failed to download thumbnail: ${imgRes.status}`);
+        const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
+        const contentType = imgRes.headers.get('content-type') || 'image/png';
+
+        // Create a picture resource on Vimeo
+        const picRes = await fetch(`https://api.vimeo.com/videos/${vimeoId}/pictures`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `bearer ${vimeoToken}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+          },
+          body: JSON.stringify({ active: true }),
+        });
+
+        if (!picRes.ok) throw new Error(`Picture create failed: ${picRes.status}`);
+        const picData = await picRes.json();
+        const uploadLink = picData.link;
+
+        // Upload the image
+        if (uploadLink) {
+          const upRes = await fetch(uploadLink, {
+            method: 'PUT',
+            headers: { 'Content-Type': contentType },
+            body: imgBuffer,
+          });
+          if (upRes.ok || upRes.status === 204) {
+            console.log(`[Vimeo] ✓ Custom thumbnail set`);
+          } else {
+            console.warn(`[Vimeo] Thumbnail upload response: ${upRes.status}`);
+          }
+        }
+      } catch (thumbErr) {
+        console.warn(`[Vimeo] Thumbnail error: ${thumbErr.message}`);
       }
     }
 
