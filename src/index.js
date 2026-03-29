@@ -107,6 +107,39 @@ app.listen(PORT, () => {
   console.log(`SFH Video Server running on port ${PORT}`);
 });
 
+// ─── Vimeo: List folders/projects (to find correct URI) ───
+app.get('/api/vimeo/folders', async (req, res) => {
+  try {
+    const vimeoToken = process.env.VIMEO_ACCESS_TOKEN;
+    if (!vimeoToken) return res.status(500).json({ error: 'VIMEO_ACCESS_TOKEN not configured' });
+
+    const vimeoRes = await fetch('https://api.vimeo.com/me/projects?per_page=50&sort=name&direction=asc', {
+      headers: {
+        'Authorization': `bearer ${vimeoToken}`,
+        'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+      },
+    });
+
+    if (!vimeoRes.ok) {
+      const errText = await vimeoRes.text();
+      return res.status(vimeoRes.status).json({ error: 'Vimeo API error', details: errText });
+    }
+
+    const data = await vimeoRes.json();
+    const folders = (data.data || []).map(f => ({
+      name: f.name,
+      uri: f.uri,
+      link: f.link,
+      videoCount: f.metadata?.connections?.videos?.total || 0,
+      created: f.created_time,
+    }));
+
+    res.json({ folders, currentConfig: process.env.VIMEO_PROJECT_URI || '(not set)' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ─── Vimeo Upload (pull approach) ───
 app.post('/api/vimeo/upload', async (req, res) => {
   try {
