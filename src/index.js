@@ -155,38 +155,7 @@ app.post('/api/vimeo/upload', async (req, res) => {
 
     console.log(`[Vimeo] Uploading: ${title || 'Untitled'}`);
 
-    // Build request body
-    const projectUri = process.env.VIMEO_PROJECT_URI; // e.g. "/users/251550913/projects/28754524"
-    const vimeoBody = {
-      upload: { approach: 'pull', link: videoUrl },
-      name: title || 'SFH Routine',
-      description: description || 'Senior Fitness Hub follow-along routine',
-      privacy: {
-        view: 'disable',
-        embed: 'whitelist',
-        download: false,
-      },
-      embed: {
-        buttons: { like: false, watchlater: false, share: false },
-        logos: { vimeo: false },
-        title: { name: 'hide', owner: 'hide', portrait: 'hide' },
-      },
-      embed_domains: [
-        'learn.senior-fitness-hub.com',
-        'seniorfitnesshub.com',
-        'senior-fitness-hub.com',
-        'pages.senior-fitness-hub.com',
-        'app.membervault.co',
-      ],
-    };
-
-    // Add to existing folder if configured
-    if (projectUri) {
-      vimeoBody.folder_uri = projectUri;
-      console.log(`[Vimeo] Target folder: ${projectUri}`);
-    }
-
-    // Create video via pull approach — Vimeo fetches from URL
+    // Step 1: Create video via pull approach
     const vimeoRes = await fetch('https://api.vimeo.com/me/videos', {
       method: 'POST',
       headers: {
@@ -194,7 +163,28 @@ app.post('/api/vimeo/upload', async (req, res) => {
         'Content-Type': 'application/json',
         'Accept': 'application/vnd.vimeo.*+json;version=3.4',
       },
-      body: JSON.stringify(vimeoBody),
+      body: JSON.stringify({
+        upload: { approach: 'pull', link: videoUrl },
+        name: title || 'SFH Routine',
+        description: description || 'Senior Fitness Hub follow-along routine',
+        privacy: {
+          view: 'disable',
+          embed: 'whitelist',
+          download: false,
+        },
+        embed: {
+          buttons: { like: false, watchlater: false, share: false },
+          logos: { vimeo: false },
+          title: { name: 'hide', owner: 'hide', portrait: 'hide' },
+        },
+        embed_domains: [
+          'learn.senior-fitness-hub.com',
+          'seniorfitnesshub.com',
+          'senior-fitness-hub.com',
+          'pages.senior-fitness-hub.com',
+          'app.membervault.co',
+        ],
+      }),
     });
 
     if (!vimeoRes.ok) {
@@ -209,7 +199,33 @@ app.post('/api/vimeo/upload', async (req, res) => {
     const vimeoLink = vimeoData.link || `https://vimeo.com/${vimeoId}`;
     const playerEmbed = vimeoData.embed?.html || null;
 
-    console.log(`[Vimeo] Upload started: ${vimeoLink} (processing will continue on Vimeo)`);
+    console.log(`[Vimeo] Video created: ${vimeoLink}`);
+
+    // Step 2: Move video into folder
+    const projectUri = process.env.VIMEO_PROJECT_URI; // "/users/251550913/projects/28754524"
+    if (projectUri && vimeoId) {
+      // Extract just the project ID number
+      const projectId = projectUri.split('/projects/')[1];
+      if (projectId) {
+        try {
+          const addRes = await fetch(`https://api.vimeo.com/me/projects/${projectId}/videos/${vimeoId}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `bearer ${vimeoToken}`,
+              'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+            },
+          });
+          if (addRes.ok || addRes.status === 204) {
+            console.log(`[Vimeo] ✓ Added to folder: project ${projectId}`);
+          } else {
+            const errText = await addRes.text();
+            console.warn(`[Vimeo] Folder add failed (${addRes.status}): ${errText}`);
+          }
+        } catch (projErr) {
+          console.warn(`[Vimeo] Folder add error: ${projErr.message}`);
+        }
+      }
+    }
 
     res.json({
       success: true,
@@ -217,7 +233,7 @@ app.post('/api/vimeo/upload', async (req, res) => {
       vimeoUri,
       vimeoLink,
       playerEmbed,
-      status: vimeoData.status, // "uploading" → "transcoding" → "available"
+      status: vimeoData.status,
     });
 
   } catch (error) {
