@@ -66,7 +66,7 @@ function progressDotsHTML(current, total) {
 function tagsHTML(tags) {
   if (!tags || !Array.isArray(tags) || tags.length === 0) return '';
   const tagBadges = tags.map(tag =>
-    `<span style="display:inline-block;background:rgba(15,118,110,0.1);color:${COLORS.teal};font-size:18px;font-weight:700;padding:6px 16px;border-radius:14px;margin:3px 4px;">${esc(tag)}</span>`
+    `<span style="display:inline-block;background:rgba(15,118,110,0.1);color:${COLORS.crimson};font-size:18px;font-weight:700;padding:6px 16px;border-radius:14px;margin:3px 4px;">${esc(tag)}</span>`
   ).join('');
   return `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;">${tagBadges}</div>`;
 }
@@ -120,7 +120,7 @@ export function titleCard(routineName, exerciseCount, totalMinutes, subtitle, le
     ? `<span style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:${COLORS.white};font-size:20px;font-weight:700;padding:8px 24px;border-radius:24px;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;">${esc(level)}</span>`
     : '';
   const subtitleHTML = subtitle
-    ? `<p style="font-size:30px;color:rgba(255,255,255,0.85);font-weight:600;font-style:italic;margin-bottom:16px;max-width:85%;">${esc(subtitle)}</p>`
+    ? `<p style="font-size:30px;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:16px;max-width:85%;">${esc(subtitle)}</p>`
     : '';
   const conditionHTML = condition
     ? `<span style="display:inline-block;background:rgba(15,118,110,0.8);color:${COLORS.white};font-size:22px;font-weight:700;padding:10px 28px;border-radius:24px;margin-top:12px;">${esc(condition)}</span>`
@@ -240,7 +240,7 @@ export function yourTurn(exNum, total, name, timeDisplay, cue, bilateral, side, 
     ? `<div style="background:${COLORS.crimson};padding:14px 28px;border-radius:10px;margin-top:16px;max-width:85%;"><p style="font-size:24px;color:${COLORS.white};font-weight:700;text-align:center;">"${esc(cue)}"</p></div>`
     : '';
   const focusHTML = focus
-    ? `<p style="font-size:22px;color:${COLORS.warmGray};font-weight:600;font-style:italic;margin-top:12px;max-width:80%;text-align:center;line-height:1.4;">${esc(focus)}</p>`
+    ? `<p style="font-size:22px;color:${COLORS.warmGray};font-weight:600;margin-top:12px;max-width:80%;text-align:center;line-height:1.4;">${esc(focus)}</p>`
     : '';
   const positionHTML = positionType
     ? `<span style="display:inline-block;background:rgba(12,17,91,0.08);color:${COLORS.navy};font-size:18px;font-weight:700;padding:6px 18px;border-radius:14px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">${esc(positionType)}</span>`
@@ -354,7 +354,7 @@ export function routineComplete(routineName, exerciseCount, totalMinutes, level,
     ? `<span style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:${COLORS.white};font-size:18px;font-weight:700;padding:6px 22px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;">${esc(level)}</span>`
     : '';
   const conditionHTML = condition
-    ? `<p style="font-size:24px;color:rgba(255,255,255,0.85);font-weight:600;font-style:italic;margin-bottom:12px;">Building your ${esc(condition.toLowerCase())}, one session at a time.</p>`
+    ? `<p style="font-size:24px;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:12px;">Building your ${esc(condition.toLowerCase())}, one session at a time.</p>`
     : '';
 
   return baseHTML(
