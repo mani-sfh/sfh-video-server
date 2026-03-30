@@ -66,7 +66,7 @@ function progressDotsHTML(current, total) {
 function tagsHTML(tags) {
   if (!tags || !Array.isArray(tags) || tags.length === 0) return '';
   const tagBadges = tags.map(tag =>
-    `<span style="display:inline-block;background:rgba(15,118,110,0.1);color:${COLORS.crimson};font-size:18px;font-weight:700;padding:6px 16px;border-radius:14px;margin:3px 4px;">${esc(tag)}</span>`
+    `<span style="display:inline-block;background:rgba(15,118,110,0.1);color:${COLORS.navy};font-size:18px;font-weight:700;padding:6px 16px;border-radius:14px;margin:3px 4px;">${esc(tag)}</span>`
   ).join('');
   return `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;">${tagBadges}</div>`;
 }
