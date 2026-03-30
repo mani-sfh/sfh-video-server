@@ -94,9 +94,9 @@ body{width:${_screenWidth}px;height:${_screenHeight}px;overflow:hidden;font-fami
 .glow{position:absolute;right:5%;top:-10%;width:50%;height:120%;background:radial-gradient(ellipse at 50% 50%,rgba(166,30,81,0.22) 0%,transparent 60%);}
 .vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,transparent 30%,rgba(0,0,0,0.5) 100%);z-index:3;}
 .accent{position:absolute;left:4.2%;top:50%;transform:translateY(-50%);width:${is1080 ? '6px' : '5px'};height:30%;background:${COLORS.crimson};border-radius:3px;z-index:4;}
-.content{position:absolute;left:6%;top:50%;transform:translateY(-50%);max-width:52%;z-index:5;}
-.badge{display:inline-block;background:#E65100;color:#fff;font-family:Impact,'Arial Black',Arial,sans-serif;font-weight:900;font-size:${is1080 ? '40px' : '28px'};padding:${is1080 ? '8px 22px' : '6px 16px'};border-radius:6px;margin-bottom:${is1080 ? '18px' : '12px'};letter-spacing:1px;}
-.title{color:#ffffff;font-family:Impact,'Arial Black',Arial,sans-serif;font-weight:900;font-size:${is1080 ? '80px' : '54px'};line-height:1.05;text-transform:uppercase;letter-spacing:2px;text-shadow:0 3px 30px rgba(0,0,0,0.7);}
+.content{position:absolute;left:6%;top:50%;transform:translateY(-50%);max-width:58%;z-index:5;}
+.badge{display:inline-block;background:#E65100;color:#fff;font-family:Impact,'Arial Black',Arial,sans-serif;font-weight:900;font-size:${is1080 ? '52px' : '36px'};padding:${is1080 ? '10px 28px' : '8px 20px'};border-radius:8px;margin-bottom:${is1080 ? '20px' : '14px'};letter-spacing:2px;}
+.title{color:#ffffff;font-family:Impact,'Arial Black',Arial,sans-serif;font-weight:900;font-size:${is1080 ? '96px' : '64px'};line-height:1.05;text-transform:uppercase;letter-spacing:3px;text-shadow:0 4px 30px rgba(0,0,0,0.7);}
 .person{position:absolute;right:-2%;bottom:-2%;width:55%;height:104%;z-index:2;-webkit-mask-image:linear-gradient(to right,transparent 0%,black 25%),linear-gradient(to top,black 90%,transparent 100%);-webkit-mask-composite:destination-in;mask-image:linear-gradient(to right,transparent 0%,black 25%),linear-gradient(to top,black 90%,transparent 100%);mask-composite:intersect;}
 .person img{width:100%;height:100%;object-fit:contain;object-position:bottom right;}
 </style></head><body>
@@ -209,7 +209,7 @@ export function watchIntro(exNum, total, name, timeDisplay, cue, tags, focus, po
     ? `<span style="display:inline-block;background:rgba(12,17,91,0.08);color:${COLORS.navy};font-size:18px;font-weight:700;padding:6px 18px;border-radius:14px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">${esc(positionType)}</span>`
     : '';
   const imageHTML = imageUrl
-    ? `<img src="${imageUrl}" alt="" style="width:280px;height:175px;object-fit:cover;border-radius:12px;margin-bottom:16px;" />`
+    ? `<img src="${imageUrl}" alt="" style="width:480px;height:280px;object-fit:cover;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 16px rgba(0,0,0,0.1);" />`
     : '';
 
   return baseHTML(
@@ -274,7 +274,7 @@ export function practiceFrame(exNum, total, name, imageUrl, cue, timeRemaining, 
     : '';
 
   const imageHTML = imageUrl
-    ? `<img src="${imageUrl}" style="max-width:720px;max-height:440px;object-fit:contain;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.1);" />`
+    ? `<img src="${imageUrl}" style="max-width:800px;max-height:460px;object-fit:contain;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.1);" />`
     : `<span style="font-size:20px;color:rgba(12,17,91,0.3);font-weight:700;">NO IMAGE</span>`;
 
   const cueHTML = cue
