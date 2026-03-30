@@ -128,6 +128,27 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
     await updateJobStatus(supabase, jobId, 'processing', 'Uploading video', 95);
     const videoUrl = await uploadVideo(supabase, jobId, finalVideoPath);
 
+    // Step 6b: Upload thumbnail PNG to Supabase Storage
+    let thumbnailUrl = null;
+    try {
+      const thumbPath = path.join(tempDir, 'intro-00-thumbnail.png');
+      const thumbBuffer = await fs.readFile(thumbPath);
+      const thumbFilename = `thumbnail_${jobId}.png`;
+      const thumbStoragePath = `generated-thumbnails/${thumbFilename}`;
+      const { error: thumbUpErr } = await supabase.storage
+        .from('videos')
+        .upload(thumbStoragePath, thumbBuffer, { contentType: 'image/png', upsert: true });
+      if (!thumbUpErr) {
+        const { data: thumbData } = supabase.storage.from('videos').getPublicUrl(thumbStoragePath);
+        thumbnailUrl = thumbData.publicUrl;
+        console.log(`[Thumbnail] Uploaded: ${thumbnailUrl}`);
+      } else {
+        console.warn(`[Thumbnail] Upload failed: ${thumbUpErr.message}`);
+      }
+    } catch (thumbErr) {
+      console.warn(`[Thumbnail] Error: ${thumbErr.message}`);
+    }
+
     // Step 7: Get file stats
     const stats = await fs.stat(finalVideoPath);
     const fileSizeMB = stats.size / (1024 * 1024);
@@ -138,6 +159,7 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
       .update({
         status: 'completed',
         output_url: videoUrl,
+        thumbnail_url: thumbnailUrl,
         file_size_mb: fileSizeMB,
         completed_at: new Date().toISOString()
       })
