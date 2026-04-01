@@ -2,7 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { generateVideo } from './videoGenerator.js';
+import { renderScreenToImage, initBrowser } from './screenRenderer.js';
 import { createClient } from '@supabase/supabase-js';
+import path from 'path';
+import { promises as fs } from 'fs';
 
 dotenv.config();
 
@@ -283,5 +286,73 @@ app.post('/api/vimeo/upload', async (req, res) => {
   } catch (error) {
     console.error('[Vimeo] Upload error:', error);
     res.status(500).json({ error: 'Vimeo upload failed', details: error.message });
+  }
+});
+
+// ─── Thumbnail Only: Generate and upload thumbnail PNG ───
+app.post('/api/thumbnail/generate', async (req, res) => {
+  try {
+    const { routineName, totalDuration, thumbnailImageUrl, thumbnailBadge, thumbnailTitle, resolution } = req.body;
+
+    if (!routineName) {
+      return res.status(400).json({ error: 'routineName is required' });
+    }
+
+    const supabase = getSupabase();
+    const dims = resolution === '1080p' ? { width: 1920, height: 1080 } : { width: 1280, height: 720 };
+    const tempDir = path.join(process.cwd(), 'temp', `thumb_${Date.now()}`);
+    await fs.mkdir(tempDir, { recursive: true });
+
+    try {
+      await initBrowser();
+
+      // Render thumbnail slide
+      const thumbPath = await renderScreenToImage({
+        type: 'thumbnail',
+        data: {
+          routineName,
+          totalDuration: totalDuration || '',
+          overlayImageUrl: thumbnailImageUrl || undefined,
+          badgeText: thumbnailBadge || undefined,
+          titleText: thumbnailTitle || undefined,
+        },
+        dimensions: dims,
+        outputPath: path.join(tempDir, 'thumbnail.png'),
+      });
+
+      // Upload to Supabase Storage with descriptive filename
+      const thumbBuffer = await fs.readFile(thumbPath);
+      const safeName = (str) => (str || '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').substring(0, 60);
+      const shortId = Date.now().toString(36);
+      const badgePart = safeName(thumbnailBadge || totalDuration);
+      const titlePart = safeName(thumbnailTitle || routineName);
+      const thumbFilename = `${badgePart}_${titlePart}_${shortId}.png`;
+      const thumbStoragePath = `thumbnails/${thumbFilename}`;
+
+      const { error: uploadErr } = await supabase.storage
+        .from('videos')
+        .upload(thumbStoragePath, thumbBuffer, { contentType: 'image/png', upsert: true });
+
+      if (uploadErr) {
+        throw new Error(`Storage upload failed: ${uploadErr.message}`);
+      }
+
+      const { data: urlData } = supabase.storage.from('videos').getPublicUrl(thumbStoragePath);
+
+      console.log(`[Thumbnail Only] Generated: ${urlData.publicUrl}`);
+
+      res.json({
+        success: true,
+        thumbnailUrl: urlData.publicUrl,
+        filename: thumbFilename,
+      });
+
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+    }
+
+  } catch (error) {
+    console.error('[Thumbnail Only] Error:', error);
+    res.status(500).json({ error: 'Thumbnail generation failed', details: error.message });
   }
 });
