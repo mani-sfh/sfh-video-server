@@ -232,45 +232,80 @@ app.post('/api/vimeo/upload', async (req, res) => {
 
     // Step 3: Set custom thumbnail if provided
     if (thumbnailUrl && vimeoId) {
-      try {
-        console.log(`[Vimeo] Setting custom thumbnail...`);
+      // Retry thumbnail upload — Vimeo needs time to process the video first
+      const maxRetries = 3;
+      const delayMs = [5000, 10000, 15000]; // 5s, 10s, 15s delays
 
-        // Download the thumbnail image
-        const imgRes = await fetch(thumbnailUrl);
-        if (!imgRes.ok) throw new Error(`Failed to download thumbnail: ${imgRes.status}`);
-        const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
-        const contentType = imgRes.headers.get('content-type') || 'image/png';
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          // Wait before trying (gives Vimeo time to process the video)
+          const waitTime = delayMs[attempt] || 10000;
+          console.log(`[Vimeo] Thumbnail attempt ${attempt + 1}/${maxRetries} — waiting ${waitTime / 1000}s...`);
+          await new Promise(r => setTimeout(r, waitTime));
 
-        // Create a picture resource on Vimeo
-        const picRes = await fetch(`https://api.vimeo.com/videos/${vimeoId}/pictures`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `bearer ${vimeoToken}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.vimeo.*+json;version=3.4',
-          },
-          body: JSON.stringify({ active: true }),
-        });
+          // Download the thumbnail image
+          const imgRes = await fetch(thumbnailUrl);
+          if (!imgRes.ok) throw new Error(`Failed to download thumbnail: ${imgRes.status}`);
+          const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
 
-        if (!picRes.ok) throw new Error(`Picture create failed: ${picRes.status}`);
-        const picData = await picRes.json();
-        const uploadLink = picData.link;
+          // Step 3a: Create a picture resource (don't activate yet)
+          const picRes = await fetch(`https://api.vimeo.com/videos/${vimeoId}/pictures`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `bearer ${vimeoToken}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+            },
+            body: JSON.stringify({ active: false }),
+          });
 
-        // Upload the image
-        if (uploadLink) {
+          if (!picRes.ok) {
+            const errText = await picRes.text();
+            throw new Error(`Picture create failed: ${picRes.status} — ${errText}`);
+          }
+          const picData = await picRes.json();
+          const uploadLink = picData.link;
+          const pictureUri = picData.uri;
+
+          if (!uploadLink) throw new Error('No upload link returned');
+
+          // Step 3b: Upload the image bytes
           const upRes = await fetch(uploadLink, {
             method: 'PUT',
-            headers: { 'Content-Type': contentType },
+            headers: { 'Content-Type': 'image/png' },
             body: imgBuffer,
           });
-          if (upRes.ok || upRes.status === 204) {
-            console.log(`[Vimeo] ✓ Custom thumbnail set`);
-          } else {
-            console.warn(`[Vimeo] Thumbnail upload response: ${upRes.status}`);
+
+          if (!upRes.ok && upRes.status !== 204) {
+            throw new Error(`Image upload failed: ${upRes.status}`);
+          }
+
+          // Step 3c: Activate the thumbnail
+          if (pictureUri) {
+            const activateRes = await fetch(`https://api.vimeo.com${pictureUri}`, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `bearer ${vimeoToken}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+              },
+              body: JSON.stringify({ active: true }),
+            });
+            if (activateRes.ok) {
+              console.log(`[Vimeo] ✓ Custom thumbnail set on attempt ${attempt + 1}`);
+            } else {
+              console.warn(`[Vimeo] Thumbnail activate response: ${activateRes.status}`);
+            }
+          }
+
+          break; // Success — exit retry loop
+
+        } catch (thumbErr) {
+          console.warn(`[Vimeo] Thumbnail attempt ${attempt + 1} failed: ${thumbErr.message}`);
+          if (attempt === maxRetries - 1) {
+            console.warn(`[Vimeo] All ${maxRetries} thumbnail attempts failed. Thumbnail not set.`);
           }
         }
-      } catch (thumbErr) {
-        console.warn(`[Vimeo] Thumbnail error: ${thumbErr.message}`);
       }
     }
 
