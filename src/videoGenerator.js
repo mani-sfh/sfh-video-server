@@ -133,8 +133,13 @@ export async function generateVideo({ jobId, routineName, exercises, resolution,
     try {
       const thumbPath = path.join(tempDir, 'intro-00-thumbnail.png');
       const thumbBuffer = await fs.readFile(thumbPath);
-      const thumbFilename = `thumbnail_${jobId}.png`;
-      const thumbStoragePath = `generated-thumbnails/${thumbFilename}`;
+      // Build descriptive filename: badge_title_shortId.png
+      const safeName = (str) => (str || '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').substring(0, 60);
+      const shortId = jobId.substring(0, 8);
+      const badgePart = safeName(thumbnailBadge || totalDuration);
+      const titlePart = safeName(thumbnailTitle || routineName);
+      const thumbFilename = `${badgePart}_${titlePart}_${shortId}.png`;
+      const thumbStoragePath = `thumbnails/${thumbFilename}`;
       const { error: thumbUpErr } = await supabase.storage
         .from('videos')
         .upload(thumbStoragePath, thumbBuffer, { contentType: 'image/png', upsert: true });
