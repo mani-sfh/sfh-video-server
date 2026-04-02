@@ -433,3 +433,80 @@ app.post('/api/thumbnail/generate', async (req, res) => {
     res.status(500).json({ error: 'Thumbnail generation failed', details: error.message });
   }
 });
+
+// ─── Vimeo: Set custom thumbnail on existing video ───
+app.post('/api/vimeo/set-thumbnail', async (req, res) => {
+  try {
+    const { vimeoId, thumbnailUrl } = req.body;
+    const vimeoToken = process.env.VIMEO_ACCESS_TOKEN;
+
+    if (!vimeoToken) return res.status(500).json({ error: 'VIMEO_ACCESS_TOKEN not configured' });
+    if (!vimeoId) return res.status(400).json({ error: 'vimeoId is required' });
+    if (!thumbnailUrl) return res.status(400).json({ error: 'thumbnailUrl is required' });
+
+    console.log(`[Vimeo Thumb] Setting thumbnail for ${vimeoId} from ${thumbnailUrl}`);
+
+    // Step 1: Download the thumbnail image
+    const imgRes = await fetch(thumbnailUrl);
+    if (!imgRes.ok) throw new Error(`Failed to download thumbnail: ${imgRes.status}`);
+    const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
+    console.log(`[Vimeo Thumb] Downloaded: ${imgBuffer.length} bytes`);
+
+    // Step 2: Create picture resource (inactive)
+    const picRes = await fetch(`https://api.vimeo.com/videos/${vimeoId}/pictures`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `bearer ${vimeoToken}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+      },
+      body: JSON.stringify({ active: false }),
+    });
+
+    if (!picRes.ok) {
+      const errText = await picRes.text();
+      throw new Error(`Picture create failed: ${picRes.status} — ${errText}`);
+    }
+    const picData = await picRes.json();
+    const uploadLink = picData.link;
+    const pictureUri = picData.uri;
+
+    if (!uploadLink) throw new Error('No upload link returned from Vimeo');
+
+    // Step 3: Upload image bytes
+    const upRes = await fetch(uploadLink, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'image/png' },
+      body: imgBuffer,
+    });
+
+    if (!upRes.ok && upRes.status !== 204) {
+      throw new Error(`Image upload failed: ${upRes.status}`);
+    }
+
+    // Step 4: Activate the thumbnail
+    if (pictureUri) {
+      const activateRes = await fetch(`https://api.vimeo.com${pictureUri}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `bearer ${vimeoToken}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+        },
+        body: JSON.stringify({ active: true }),
+      });
+
+      if (!activateRes.ok) {
+        const errText = await activateRes.text();
+        throw new Error(`Thumbnail activate failed: ${activateRes.status} — ${errText}`);
+      }
+    }
+
+    console.log(`[Vimeo Thumb] ✓ Thumbnail set for ${vimeoId}`);
+    res.json({ success: true, vimeoId });
+
+  } catch (error) {
+    console.error('[Vimeo Thumb] Error:', error);
+    res.status(500).json({ error: 'Vimeo thumbnail upload failed', details: error.message });
+  }
+});
